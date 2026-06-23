@@ -26,6 +26,7 @@ A portfolio of end-to-end data analytics projects spanning **Python, SQL, Power 
 | 18 | [UPI Transaction Data Analytics](UPI-Transaction-Data-Analytics) | UPI transaction patterns & optimization | Python |
 | 19 | [Bank Loan Prediction](Bank-loan-prediction) | Predicting loan approval & dashboard | Python, Power BI |
 | 20 | [AI Lung Diagnostics](AI-Lung-Diagnostics) | Lung cancer diagnostics with SQL & dashboards | SQL, Dashboards |
+| 21 | [Crypto Price Tracker](Crypto-Price-Tracker) | Tracking and charting cryptocurrency prices | Python |
 
 ## 🛠️ Skills Demonstrated
 
