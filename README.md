@@ -23,6 +23,7 @@ A portfolio of end-to-end data analytics projects spanning **Python, SQL, Power 
 | 15 | [The Rollercoaster Database](The-Rollercoaster-Database) | Exploring rollercoaster stats and trends | Python |
 | 16 | [Big Basket Inventory Analysis](Big_Basket_inventory_analysis) | Product catalogue & inventory insights | Python |
 | 17 | [COVID-19 Hospitalization Rates Analysis](COVID-19_Hospitalization_Rates_Analysis) | Trends in COVID-19 hospitalization rates | Python |
+| 18 | [UPI Transaction Data Analytics](UPI-Transaction-Data-Analytics) | UPI transaction patterns & optimization | Python |
 
 ## 🛠️ Skills Demonstrated
 
