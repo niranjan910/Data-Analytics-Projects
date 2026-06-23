@@ -1,0 +1,326 @@
+# UK Online Retail Analytics (2010–2011)
+
+This project follows the principle of the **Capstone / Data Analytics Methodology**, which involves the following steps:
+
+1. `Business Problem Understanding` – Defining the real-world challenge and project objectives.  
+2. `Data Loading` – Importing the dataset into the analysis environment (Excel, Python, SQL, etc.).  
+3. `Data Understanding` – Exploring dataset structure, column types, shape, and missing values.  
+4. `Data Exploration` – Performing column-level checks, distributions, and identifying anomalies.  
+5. `Data Cleaning` – Handling missing values, duplicates, outliers, and inconsistencies.  
+6. `Feature Engineering` – Creating new variables (e.g., Revenue, InvoiceMonth, flags for cancellations).  
+7. `Data Analysis` – Aggregating and summarizing data to extract business insights.  
+8. `EDA (Exploratory Data Analysis)` – Visualizing patterns, trends, and relationships using plots/charts.  
+9. `Final Report / Storytelling` – Presenting findings through dashboards, reports, and business recommendations.  
+
+---
+
+## Dataset Overview
+
+The dataset captures all sales orders for one year.  
+Each row = **one product line** on an invoice.
+
+| Column Name     | Description                                                                          |
+|-----------------|--------------------------------------------------------------------------------------|
+| `InvoiceNo`     | Unique order ID — if it starts with 'C', the invoice was cancelled.                  |
+| `StockCode`     | Product/item code.                                                                   |
+| `Description`   | Name or short description of the product.                                            |
+| `Quantity`      | Number of units ordered. Negative = returned.                                        |
+| `InvoiceDate`   | Date and timestamp when the order was placed.                                        |
+| `UnitPrice`     | Price per unit (GBP).                                                                |
+| `CustomerID`    | Unique customer ID. Some transactions have missing IDs.                              |
+| `Country`       | Customer’s country.                                                                  |
+
+---
+
+## `Business Problem`
+An online retail company is struggling to improve revenue and customer retention. While they have large ammount of transactional data, they lack insights into which products drive sales which customer are most valuable and how purchasing patterns vary across regions and time.
+
+The company wants to answer critical questions:
+1. Who are the most valuable customers and how do we retain them?
+2. Which products and categories generate the highest revenue and which products often seel together?
+3. What are the seasonal or monthly sales patterns and how can inventory be managed accordingly?
+4. Which markets (countries) should we focous for the expansion or targeted promotions?
+5. How do we returns and cancellations (negative quantities) affect overall revenue?
+
+---
+
+## `Data Loading`
+This data set is taken from UCI and it consists of total 541909 rows and 8 columns 
+- The name of all the rows are - `InvoiceNo`,`StockCode`,`Description`,`Quantity`,`InvoiceDate`,`UnitPrice`,`CustomerID`,`Country`
+- The Data Types of each Columns are as -
+1. `InvoiceNo`              object
+2. `StockCode`              object
+3. `Description`            object
+4. `Quantity`                int64
+5. `InvoiceDate`    datetime64[ns]
+6. `UnitPrice`             float64
+7. `CustomerID`            float64
+8. `Country`                object
+- The number of missing values in each column is -
+1. `InvoiceNo`              0
+2. `StockCode`              0
+3. `Description`            1454
+4. `Quantity`               0
+5. `InvoiceDate`            0 
+6. `UnitPrice`              0
+7. `CustomerID`             135080
+8. `Country`                0
+
+---
+
+## `Data Exploration`
+- `InvoiceNo`
+
+**Observations (Summary):**
+- Datatype: `object`, Total Rows: 541,909, Unique: 25,900  
+- No missing values detected  
+- Duplicate InvoiceNo–StockCode combinations present (~20,378 rows)  
+- Cancelled invoices identified (prefix `"C"`) → 3,836 invoices, 9,288 rows  
+- InvoiceNo length mostly 6 digits, except cancelled ones with 7 characters  
+- Each invoice may contain multiple StockCodes (basket of items)  
+- Distribution of items per invoice is skewed (most invoices have 1–10 items, some with 200+)  
+
+**Steps for Data Cleaning**
+1. Ensure `InvoiceNo` is treated as a categorical/string variable  
+2. Separate cancelled invoices (prefix `"C"`) for focused analysis  
+3. Remove duplicate `InvoiceNo–StockCode` rows if redundant  
+4. Validate invoice-level aggregations (total quantity, total revenue)  
+5. Check for unusually large/small invoice sizes (possible outliers)  
+6. Consider creating a new column `IsCancelled` for easier filtering  
+
+----
+
+- `StockCode`
+**Observations (Summary):**
+- Datatype: `object`, Total Rows: 541,909, Unique: 25,900  
+- No missing values detected  
+- StockCode length mostly 5–6 characters (max = 12)  
+- Presence of **non-numeric codes** (e.g., `DOT`, `POST`, `BANK CHARGES`) → 54,873 rows  
+- Some StockCodes map to **multiple product descriptions**  
+- Frequent StockCodes: `85123A`, `22423`, `85099B`, `47566`  
+- Top revenue generators: `DOT`, `22423`, `47566`, `85123A`, `85099B`  
+
+**Steps for Data Cleaning**
+1. Convert all StockCodes to string & uppercase  
+2. Handle/remove special codes (e.g., `DOT`, `POST`, `BANK CHARGES`)  
+3. Standardize inconsistent cases (e.g., `47591b` → `47591B`)  
+4. Flag/handle very rare StockCodes (appearing once)  
+5. Resolve cases where a StockCode maps to multiple descriptions  
+6. Validate StockCode–Description mapping with Quantity/Revenue  
+
+----
+
+- `Description`
+**Observations (Summary):**
+- Datatype: `object`, Total Rows: 541,909, Unique Values: 1,454  
+- No missing values overall, but some `StockCodes` have missing/blank descriptions  
+- Text length: mostly **23–31 characters** (max = 35)  
+- Top descriptions: `WHITE HANGING HEART T-LIGHT HOLDER`, `REGENCY CAKESTAND 3 TIER`, `JUMBO BAG RED RETROSPOT`  
+- Rare/erroneous descriptions include: `"Display"`, `"Missing"`, `"historic computer difference?....se"`  
+- Around **55,302 descriptions** contain special characters (e.g., dots, symbols)  
+- Several `StockCodes` map to **multiple different descriptions** (e.g., `20713`, `23084`, `85175`)  
+
+**Steps for Data Cleaning**
+1. **Handle missing descriptions** → Impute using `StockCode` mapping or remove if invalid  
+2. **Standardize text** → Convert to uppercase, strip whitespace  
+3. **Remove/replace erroneous entries** (e.g., `"Missing"`, `"Display"`, gibberish text)  
+4. **Clean special characters** (retain only meaningful alphanumeric text)  
+5. **Resolve StockCode–Description conflicts** → keep the most frequent/valid mapping  
+6. Optionally perform **text preprocessing** (remove stopwords, lemmatization) for product categorization  
+
+---
+
+`Quantity`
+**Observations (Summary):**
+- Datatype: `int64`, Total Rows: 541,909, Unique Values: 722  
+- No missing values detected  
+- Distribution shows heavy skew with extreme outliers  
+- Typical range:  
+  - 25% = 1, Median = 3, 75% = 10  
+  - Mean = ~9.55 (much higher std = 218.08)  
+- Values range from **-80,995 to +80,995**  
+- **Negative quantities** detected → 10,624 rows (likely returns/cancellations)  
+- **Zero quantities** → none  
+- **Most frequent quantities**: 1, 2, 12, 6, 4, 3, 24, 10  
+- **Extreme outliers**: 4,950 rows > 99th percentile (Quantity > 100)  
+
+**Steps for Data Cleaning**
+1. Validate negative quantities — decide whether to keep (for returns) or separate them.  
+2. Check for erroneous extreme values (e.g., `Quantity = 80,995`) and cap/remove if invalid.  
+3. Ensure `Quantity` > 0 for normal sales records.  
+4. Investigate unusual bulk quantities (top outliers) for possible data entry errors.  
+5. Standardize handling of returns (negative values) in further analysis.  
+
+---
+
+`InvoiceDate`
+**Observations (Summary):**
+- Datatype: `datetime64[ns]`, Total Rows: 541,909, Missing Values: 0  
+- Unique Values: 23,260  
+- Sample Values:  
+  - `2011-06-21 16:35:00`, `2011-11-22 15:41:00`, `2011-11-29 15:06:00`  
+- Date Range: **2010-12-01 08:26:00 → 2011-12-09 12:50:00**  
+- Invalid/Coerced NaT values: 0  
+
+**Extracted Components:**  
+- Year, Month, Day, Hour, Weekday successfully extracted for temporal analysis.  
+- Sample:  
+  - Year = 2010, Month = 12, Day = 1, Hour = 8, Weekday = Wednesday  
+
+**Transaction Distribution:**  
+- **By Year** → 2010: 42,481, 2011: 499,428  
+- **By Month** → Peak in Nov (84,711), followed by Dec (68,006), Oct (60,742)  
+- **By Weekday** → Thursday (103,857) & Tuesday (101,808) highest, Friday lower (82,193)  
+- **By Hour** → Sales peak between **10 AM – 4 PM** (most transactions at 12–3 PM)  
+
+**Steps for Data Cleaning / Preparation**  
+1. Ensure all timestamps are in proper `datetime64[ns]` format.  
+2. Check for **time-zone consistency** (if data comes from multiple regions).  
+3. Flag any **future/past outliers** beyond business period.  
+4. Standardize to **local business hours** if needed.  
+5. Handle **partial day coverage** (e.g., very low transactions at 6–7 AM, 8 PM onwards).  
+
+**Next Steps for Data Analysis**  
+1. **Seasonality Analysis** → monthly/weekly sales trends.  
+2. **Peak Hours Identification** → focus promotions during 10 AM – 4 PM.  
+3. **Day-of-Week Impact** → compare weekday vs. weekend sales performance.  
+4. **Year-over-Year Growth** → evaluate 2010 → 2011 growth.  
+5. **Holiday / Event Impact** → investigate spikes in Nov–Dec (holiday shopping).  
+6. Create **time-series plots** (line plots, heatmaps by weekday-hour).  
+
+---
+
+
+
+
+
+
+
+
+
+This project analyzes a real-world **UK online retail dataset** containing **540,000+ transactions** from Dec 2010 to Dec 2011.  
+The goal is to transform messy raw data into **clear business insights** through **data cleaning**, **DAX measures**, **visual analysis**, and **interactive Power BI dashboards**.
+
+It answers key business questions, such as:
+- 📈 What are the sales trends across the year?
+- 🔄 Which products are cancelled or returned the most?
+- 👥 Who are our most valuable customers?
+- 🌍 Where are we selling the most — and where can we grow next?
+
+
+
+## 🧹 Data Cleaning Highlights
+
+Key actions taken to clean & prepare the data for analysis:
+
+- 🔍 **Missing values**: Filled unknown product names with **"Unknown Product"**, missing Customer IDs with placeholder **99999**.
+- 📌 **New columns**:
+  - `Is_Cancelled` — flags invoices starting with ‘C’
+  - `Is_Return` — flags negative quantities
+- ✏️ **Text cleanup**: Standardized case, trimmed spaces, removed junk like “?”, “missing”, etc.
+- 📅 **Date split**: Separated `InvoiceDate` into **Invoice_Date** and **Invoice_Time** for better time-based analysis.
+- 🗂️ **StockCode categories**: Grouped special codes (e.g., POST, Gift, Service) into `StockCode_Type` for better product classification.
+
+---
+
+## 📊 Dashboards & Key Analysis
+
+This project delivers **6 interactive dashboards**, each tackling a different **business goal**.
+
+---
+
+### 1️⃣ Sales Overview  
+![Sales Overview](Dashboards/Sales%20Overview.png)
+
+**Key Findings:**
+- Strong holiday spike in **November**; revenue peaks near £1.9M.
+- **April** is the lowest revenue month.
+- Mid-year (May–Aug) shows steady sales ~£0.72M–£0.77M.
+- Clear seasonal patterns — useful for forecasting.
+
+---
+
+### 2️⃣ Cancellations & Returns  
+![Returns & Cancellations](Dashboards/Return%20&%20Cancellation.png)
+
+**Key Findings:**
+- Overall cancellation/return rates are very low (~1%).
+- Most issues occur within the **UK**, peaking in holiday months (Sept–Nov).
+- Specific products show high return volumes (e.g., certain gift items).
+- Estimated **revenue loss from returns**: £881K+.
+
+---
+
+### 3️⃣ Order Patterns  
+![Order Patterns](Dashboards/Order%20Pattern.png)
+
+**Key Findings:**
+- Order volumes peak in **November (~3.7K orders)**.
+- **February** is the lowest (post-holiday slump).
+- Core buying hours: **10 AM–3 PM**, especially around lunch.
+- Busiest days: first 10 days of each month.
+
+---
+
+### 4️⃣ Customer Insights  
+![Customer Insights](Dashboards/Customer%20Insight.png)
+
+**Key Findings:**
+- **High-value customers (37%) generate 80%+ of revenue.**
+- Majority are **low-value** — an opportunity for marketing.
+- Most customers are from **UK**, **Germany**, **France**, **Netherlands**, **Italy**.
+- International sales are growing in **Asia, Australia**, and parts of **Africa**.
+
+---
+
+### 5️⃣ Geographic Sales  
+![Geographic Sales](Dashboards/Geographic%20sales.png)
+
+**Key Findings:**
+- **UK = 84%** of total revenue.
+- Non-UK sales: **15%** — steady but with expansion potential.
+- **Ireland, Germany, Netherlands** are strong non-UK markets.
+- New sales opportunities exist in **Europe & Asia**.
+
+---
+
+### 6️⃣ Product Performance  
+![Product Performance](Dashboards/Product%20Performance.png)
+
+**Key Findings:**
+- **3,900+ unique products** sold — wide range.
+- Top items include **Zinc T-Light Holder Stars**, **Winkie Candle Stick**, etc.
+- Some products result in net loss due to excessive returns.
+- Long-tail items sell infrequently — may need rationalizing for better inventory control.
+
+---
+
+## 🚧 Challenges & Learnings
+
+Working with real retail data brought real-life roadblocks:
+- 📌 Lots of **missing or dirty product names**.
+- 📌 **Returns/cancellations** mixed into the same field (`Quantity`).
+- 📌 No clear product categories — inferred manually.
+- 📌 **High data volume (~540K rows)** — handled with DAX optimizations in Power BI.
+- 📌 Partial or missing customer data — handled with placeholders.
+- 📌 Time-based trends needed custom columns for daily/hourly breakdowns.
+
+---
+
+## 📁 Repository Contents
+
+This repo is a **complete end-to-end Power BI analytics showcase**, ideal for students, data analysts, or hiring managers.
+
+- ✅ **Clean dataset** ready for BI work.
+- ✅ **All DAX measures documented**.
+- ✅ **Power BI (.pbix) file** with visuals and interactive filters.
+- ✅ **Documentation** covering data cleaning, DAX logic, and key observations.
+- ✅ **Visual dashboards** that answer real business questions.
+
+---
+
+> 📈 **Goal:** Show how messy raw data can turn into meaningful, actionable insights for better decisions.
+
+---
+
+**Enjoy exploring — and feel free to fork or build on it! 🚀**
