@@ -18,6 +18,7 @@ A portfolio of end-to-end data analytics projects spanning **Python, SQL, Power 
 | 10 | [AI CareerScope Analysis](AI_CareerScope_Analysis) | AI job market, skills & automation risk | Python, Power BI |
 | 11 | [Sleep Pattern Analysis](Sleep_pattern__Analysis) | Factors influencing sleep patterns | Python |
 | 12 | [E-commerce Return Rate Analysis](E-commerce-Return-Rate-Analysis) | Drivers of product return rates | Python |
+| 13 | [Heart Stroke Prediction Analysis](Heart-Stroke-Prediction-Analysis) | Predicting stroke risk from health indicators | Python |
 
 ## 🛠️ Skills Demonstrated
 
