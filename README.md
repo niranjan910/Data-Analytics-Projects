@@ -20,6 +20,7 @@ A portfolio of end-to-end data analytics projects spanning **Python, SQL, Power 
 | 12 | [E-commerce Return Rate Analysis](E-commerce-Return-Rate-Analysis) | Drivers of product return rates | Python |
 | 13 | [Heart Stroke Prediction Analysis](Heart-Stroke-Prediction-Analysis) | Predicting stroke risk from health indicators | Python |
 | 14 | [AI Job Market Analysis 2025](AI-Job-Market-Analysis-2025) | AI/tech job postings, salaries & hiring trends | Python |
+| 15 | [The Rollercoaster Database](The-Rollercoaster-Database) | Exploring rollercoaster stats and trends | Python |
 
 ## 🛠️ Skills Demonstrated
 
