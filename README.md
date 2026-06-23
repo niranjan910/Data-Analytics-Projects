@@ -25,6 +25,7 @@ A portfolio of end-to-end data analytics projects spanning **Python, SQL, Power 
 | 17 | [COVID-19 Hospitalization Rates Analysis](COVID-19_Hospitalization_Rates_Analysis) | Trends in COVID-19 hospitalization rates | Python |
 | 18 | [UPI Transaction Data Analytics](UPI-Transaction-Data-Analytics) | UPI transaction patterns & optimization | Python |
 | 19 | [Bank Loan Prediction](Bank-loan-prediction) | Predicting loan approval & dashboard | Python, Power BI |
+| 20 | [AI Lung Diagnostics](AI-Lung-Diagnostics) | Lung cancer diagnostics with SQL & dashboards | SQL, Dashboards |
 
 ## 🛠️ Skills Demonstrated
 
